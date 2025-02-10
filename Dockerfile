@@ -23,4 +23,5 @@ RUN npm install -g ngrok
 EXPOSE 8080
 
 # Comando para iniciar o jogo e o ngrok simultaneamente
-CMD npm run dev & ngrok http 8080 --log stdout
+# CMD npm run dev & ngrok http 8080 --log stdout
+CMD npm run dev

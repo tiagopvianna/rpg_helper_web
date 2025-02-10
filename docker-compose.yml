@@ -7,4 +7,4 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    command: /bin/sh -c "npm run dev & ngrok http 8080 --log stdout"
+    command: npm run dev
