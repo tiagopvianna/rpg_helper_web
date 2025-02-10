@@ -30,4 +30,4 @@ docker-compose down
 docker-compose up
 ```
 
-## **🚀 Agora está pronto!**
+## **🚀 Now it's ready!**
