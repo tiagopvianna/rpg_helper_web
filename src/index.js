@@ -1,5 +1,17 @@
 import Phaser from "phaser";
 
+// 🔹 Se houver uma instância anterior do jogo, destrua antes de criar uma nova
+if (window.game) {
+  console.log("DESTRUINDO INSTANCIA ANTIGA...");
+  window.game.destroy(true);
+  window.game = null; // 🔹 Certifique-se de limpar a referência
+}
+
+if (module.hot) {
+  console.log("module is hot, baby!");
+  module.hot.accept();
+}
+
 const config = {
   type: Phaser.AUTO,
   width: 400,
@@ -14,7 +26,9 @@ const config = {
 let piece;
 let enemy;
 let isSelected = false;
-const game = new Phaser.Game(config);
+
+
+window.game = new Phaser.Game(config);
 
 function preload() {
   console.log("Loading assets...");
@@ -43,7 +57,7 @@ function create() {
     piece.setScale(0.6);
   
     // Add enemy piece at a fixed position
-    enemy = this.add.sprite(150, 300, "enemy");
+    enemy = this.add.sprite(200, 300, "enemy");
     enemy.setScale(0.6);
   
     // Enable input detection for player movement & attack
