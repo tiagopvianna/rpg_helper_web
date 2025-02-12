@@ -14,14 +14,17 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    // Put websocked endpoint here
-    this.socket = io("http://localhost:8080");
+    this.socket = io("http://localhost:3000");
 
     this.add.image(this.scale.width / 2, this.scale.height / 2, "board")
       .setDisplaySize(this.scale.width, this.scale.height);
 
     this.player = this.add.sprite(150, 100, "piece").setInteractive();
     
+   this.setListeners();
+  }
+
+  setListeners() {
     this.socket.on("currentPlayers", (players) => {
       Object.keys(players).forEach((id) => {
         if (id !== this.socket.id) {
