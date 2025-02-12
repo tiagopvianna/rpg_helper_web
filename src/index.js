@@ -1,14 +1,14 @@
 import Phaser from "phaser";
+import GameScene from "./GameScene";
 
-// 🔹 Se houver uma instância anterior do jogo, destrua antes de criar uma nova
+// Destroys any previous instance
 if (window.game) {
-  console.log("DESTRUINDO INSTANCIA ANTIGA...");
   window.game.destroy(true);
-  window.game = null; // 🔹 Certifique-se de limpar a referência
+  window.game = null;
 }
 
+// Accepts hot reload
 if (module.hot) {
-  console.log("module is hot, baby!");
   module.hot.accept();
 }
 
@@ -16,11 +16,13 @@ const config = {
   type: Phaser.AUTO,
   width: 400,
   height: 700,
-  scene: {
-    preload: preload,
-    create: create,
-    update: update
-  }
+  scene: GameScene
+  // TODO: pass this logic to GameScene
+  // scene: {
+  //   preload: preload,
+  //   create: create,
+  //   update: update
+  // }
 };
 
 let piece;
@@ -57,7 +59,7 @@ function create() {
     piece.setScale(0.6);
   
     // Add enemy piece at a fixed position
-    enemy = this.add.sprite(200, 300, "enemy");
+    enemy = this.add.sprite(100, 300, "enemy");
     enemy.setScale(0.6);
   
     // Enable input detection for player movement & attack

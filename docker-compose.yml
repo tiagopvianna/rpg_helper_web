@@ -9,6 +9,15 @@ services:
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - WATCHPACK_POLLING=true  # 🔹 Faz com que Webpack monitore mudanças corretamente
+      - WATCHPACK_POLLING=true
     command: npm run dev
     restart: always
+  server:
+    build: ./server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server:/server
+      - /server/node_modules
+    working_dir: /server
+    command: node index.js
