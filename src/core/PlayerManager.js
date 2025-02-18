@@ -19,7 +19,7 @@ export default class PlayerManager {
 
         this.localPlayer.on("pointerdown", (pointer, localX, localY, event) => {
             event.stopPropagation();
-            return this.selectLocalPlayer();
+            this.selectLocalPlayer();
         },
         );
 
