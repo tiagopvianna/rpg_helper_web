@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import GameScene from "./GameScene";
+import GameScene from "./scenes/GameScene";
 
 // Destroys any previous instance
 if (window.game) {
@@ -17,14 +17,10 @@ const config = {
   width: 400,
   height: 700,
   scene: GameScene
-  // TODO: pass this logic to GameScene
-  // scene: {
-  //   preload: preload,
-  //   create: create,
-  //   update: update
-  // }
 };
 
+
+// LEGACY CODE
 let piece;
 let enemy;
 let isSelected = false;

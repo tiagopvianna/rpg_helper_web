@@ -18,7 +18,9 @@ io.on("connection", (socket) => {
 
   players[socket.id] = { x: 150, y: 100 };
 
+  // emite para o socket atual
   socket.emit("currentPlayers", players);
+  // emite para os outros sockets que não este
   socket.broadcast.emit("newPlayer", { id: socket.id, ...players[socket.id] });
 
   socket.on("playerMove", (data) => {
