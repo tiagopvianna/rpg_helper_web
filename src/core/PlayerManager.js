@@ -1,43 +1,65 @@
+import Player from "./entities/Player.js";
+
 export default class PlayerManager {
     constructor(scene, socketService) {
         this.scene = scene;
         this.socketService = socketService;
         this.players = {};
         this.localPlayer = null;
-        // todo: move to Player.js
-        this.movementCircle = this.scene.add.graphics();
-        this.moveRange = 100;
-        this.movementCircle.setAlpha(0);
 
         this.initializeLocalPlayer();
         this.setListeners();
     }
 
     initializeLocalPlayer() {
-        this.localPlayer = this.scene.add.sprite(150, 100, "piece").setInteractive();
-        this.localPlayer.isSelected = false;
+        this.socketService.on("connect", () => {
+            const socketId = this.socketService.socket.id;
+            this.localPlayer = new Player(this.scene, socketId, 150, 100, "piece", true);
 
-        this.localPlayer.on("pointerdown", (pointer, localX, localY, event) => {
-            event.stopPropagation();
-            this.selectLocalPlayer();
-        },
-        );
-
-        this.players["local"] = this.localPlayer;
+            this.players[socketId] = this.localPlayer;
+        });
     }
 
-    addPlayer(id, x, y, texture = "piece") {
+    addPlayer(id, x, y, texture = "enemy") {
         if (!this.players[id]) {
-            let player = this.scene.add.sprite(x, y, texture).setInteractive();
-            player.isSelected = false;
+            let player = new Player(this.scene, id, x, y, texture);
 
-            // player.on("pointerdown", () => {
-            //     this.localPlayer = this.selectLocalPlayer();
-            // });
+            player.sprite.on("pointerdown", (pointer, localX, localY, event) => {
+                event.stopPropagation();
+
+                if (this.localPlayer.isSelected) {
+                    this.attackPlayer(player, id);
+                }
+            });
 
             this.players[id] = player;
         }
     }
+
+    attackPlayer(enemy, id) {
+        const distance = Phaser.Math.Distance.Between(
+            this.localPlayer.sprite.x, this.localPlayer.sprite.y, enemy.sprite.x, enemy.sprite.y
+        );
+
+        // By now checking by move range
+        if (distance <= this.localPlayer.moveRange) {
+            console.log(`⚔️ Attacking ${id}!`);
+
+            enemy.applyDamageEffect();
+
+            this.socketService.emit("playerAttack", id);
+
+            this.localPlayer.toggleSelection();
+        } else {
+            console.log("❌ Target is out of range!");
+        }
+    }
+
+    // TODO: implement convert mechanic
+    convertEnemy(enemy) {
+        return;
+    }
+
 
     removePlayer(id) {
         if (this.players[id]) {
@@ -48,32 +70,8 @@ export default class PlayerManager {
 
     updatePlayer(id, x, y) {
         if (this.players[id]) {
-            this.players[id].x = x;
-            this.players[id].y = y;
+            this.players[id].moveTo(x, y);
         }
-    }
-
-    selectLocalPlayer() {
-        if (!this.localPlayer.isSelected) {
-            this.localPlayer.setTexture("piece_selected");
-            this.localPlayer.isSelected = true;
-            this.showMoveRange(this.localPlayer);
-        } else {
-            this.localPlayer.setTexture("piece");
-            this.localPlayer.isSelected = false;
-            this.hideMoveRange();
-        }
-    }
-
-    showMoveRange(player) {
-        this.movementCircle.clear();
-        this.movementCircle.lineStyle(2, 0x0000ff, 1);
-        this.movementCircle.strokeCircle(player.x, player.y, this.moveRange);
-        this.movementCircle.setAlpha(1);
-    }
-
-    hideMoveRange() {
-        this.movementCircle.setAlpha(0);
     }
 
     setListeners() {
@@ -81,22 +79,28 @@ export default class PlayerManager {
         this.scene.input.on("pointerdown", (pointer) => {
             if (this.localPlayer.isSelected) {
                 const distance = Phaser.Math.Distance.Between(
-                    this.localPlayer.x, this.localPlayer.y, pointer.x, pointer.y
+                    this.localPlayer.sprite.x, this.localPlayer.sprite.y, pointer.x, pointer.y
                 );
 
-                if (distance <= this.moveRange) {
-                    this.localPlayer.x = pointer.x;
-                    this.localPlayer.y = pointer.y;
-                    this.selectLocalPlayer();
+                if (distance <= this.localPlayer.moveRange) {
+                    this.localPlayer.moveTo(pointer.x, pointer.y);
+                    this.localPlayer.toggleSelection();
                     this.socketService.emit("playerMove", { x: pointer.x, y: pointer.y });
                 }
+            }
+        });
+
+        this.socketService.on("playerHit", (targetId) => {
+            if (this.players[targetId]) {
+                console.log(`Player ${targetId} hit!`);
+                this.players[targetId].applyDamageEffect();
             }
         });
 
         // Atualiza lista de jogadores ao entrar
         this.socketService.on("currentPlayers", (players) => {
             Object.keys(players).forEach((id) => {
-                if (id !== this.socketService.socket.id) {
+                if (id !== this.localPlayer.id) {
                     this.addPlayer(id, players[id].x, players[id].y);
                 }
             });
@@ -107,7 +111,6 @@ export default class PlayerManager {
             this.addPlayer(playerData.id, playerData.x, playerData.y);
         });
 
-        // Jogador saindo
         this.socketService.on("playerLeft", (playerId) => {
             this.removePlayer(playerId);
         });
@@ -115,7 +118,7 @@ export default class PlayerManager {
         // Atualização de posição dos jogadores
         this.socketService.on("updatePlayers", (players) => {
             Object.keys(players).forEach((id) => {
-                if (id !== this.socketService.socket.id) {
+                if (id !== this.localPlayer.id) {
                     this.updatePlayer(id, players[id].x, players[id].y);
                 }
             });

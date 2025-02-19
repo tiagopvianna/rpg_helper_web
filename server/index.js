@@ -30,6 +30,13 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("playerAttack", (targetId) => {
+    if (players[targetId]) {
+      console.log(`⚔️ Player ${socket.id} attacked ${targetId}!`);
+      io.emit("playerHit", targetId);
+    }
+  });
+
   socket.on("disconnect", () => {
     console.log(`🔴 Player disconnected: ${socket.id}`);
     delete players[socket.id];
