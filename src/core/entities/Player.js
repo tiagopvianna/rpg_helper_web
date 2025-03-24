@@ -1,6 +1,7 @@
 import SpriteAnimation from "./SpriteAnimation.js";
 import Animator from "./Animator.js";
 import Vector from "../utils/Vector.js";
+import Collider from "./Collider.js";
 
 export default class Player {
     constructor(scene, id, startingPosition, isLocal = false) {
@@ -11,13 +12,17 @@ export default class Player {
         this.movementCircle = this.scene.add.graphics();
         this.moveRange = 100;
         this.movementCircle.setAlpha(0);
+        this.collider = new Collider(this, new Vector(37,28), 21, 33);
 
         this.sprite = this.scene.add.sprite(startingPosition.x, startingPosition.y, 'player_idle', 0).setInteractive(); // Set the initial frame to 0
 
         if (isLocal) {
             this.sprite.on("pointerdown", (pointer, localX, localY, event) => {
-                event.stopPropagation();
-                this.toggleSelection();
+                if (this.collider.containsPoint(new Vector(localX, localY)))
+                {
+                    event.stopPropagation();
+                    this.toggleSelection();
+                }
             });
         }
 
