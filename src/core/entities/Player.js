@@ -1,4 +1,5 @@
 import SpriteAnimation from "./SpriteAnimation.js";
+import Animator from "./Animator.js";
 
 export default class Player {
     constructor(scene, id, startingPosition, isLocal = false) {
@@ -23,32 +24,28 @@ export default class Player {
         this.currentDirection = Player.Direction.SOUTH;
         this.isWalking = false;
 
-        this.idleAnimations = {};
-        this.idleAnimations[Player.Direction.SOUTH] = new SpriteAnimation(this, 'player_idle', 8, 0, 0);
-        this.idleAnimations[Player.Direction.SOUTHWEST] = new SpriteAnimation(this, 'player_idle', 8, 1, 1);
-        this.idleAnimations[Player.Direction.WEST] = new SpriteAnimation(this, 'player_idle', 8, 2, 2);
-        this.idleAnimations[Player.Direction.NORTHWEST] = new SpriteAnimation(this, 'player_idle', 8, 3, 3);
-        this.idleAnimations[Player.Direction.NORTH] = new SpriteAnimation(this, 'player_idle', 8, 4, 4);
-        this.idleAnimations[Player.Direction.NORTHEAST] = new SpriteAnimation(this, 'player_idle', 8, 5, 5);
-        this.idleAnimations[Player.Direction.EAST] = new SpriteAnimation(this, 'player_idle', 8, 6, 6);
-        this.idleAnimations[Player.Direction.SOUTHEAST] = new SpriteAnimation(this, 'player_idle', 8, 7, 7);
-        
-        
-        this.walkAnimations = {};
-        this.walkAnimations[Player.Direction.SOUTH] = new SpriteAnimation(this, 'player_walking', 8, 0, 5);
-        this.walkAnimations[Player.Direction.SOUTHWEST] = new SpriteAnimation(this, 'player_walking', 8, 6, 11);
-        this.walkAnimations[Player.Direction.WEST] = new SpriteAnimation(this, 'player_walking', 8, 12, 17);
-        this.walkAnimations[Player.Direction.NORTHWEST] = new SpriteAnimation(this, 'player_walking', 8, 18, 23);
-        this.walkAnimations[Player.Direction.NORTH] = new SpriteAnimation(this, 'player_walking', 8, 24, 29);
-        this.walkAnimations[Player.Direction.NORTHEAST] = new SpriteAnimation(this, 'player_walking', 8, 30, 35);
-        this.walkAnimations[Player.Direction.EAST] = new SpriteAnimation(this, 'player_walking', 8, 36, 41);
-        this.walkAnimations[Player.Direction.SOUTHEAST] = new SpriteAnimation(this, 'player_walking', 8, 42, 47);
-        
-        this.currentAnimation = this.idleAnimations[this.currentDirection];
-        this.currentAnimation.play();
+        const animations = {};
+        animations['idle_south'] = new SpriteAnimation('player_idle', 8, 0, 0);
+        animations['idle_southwest'] = new SpriteAnimation('player_idle', 8, 1, 1);
+        animations['idle_west'] = new SpriteAnimation('player_idle', 8, 2, 2);
+        animations['idle_northwest'] = new SpriteAnimation('player_idle', 8, 3, 3);
+        animations['idle_north'] = new SpriteAnimation('player_idle', 8, 4, 4);
+        animations['idle_northeast'] = new SpriteAnimation('player_idle', 8, 5, 5);
+        animations['idle_east'] = new SpriteAnimation('player_idle', 8, 6, 6);
+        animations['idle_southeast'] = new SpriteAnimation('player_idle', 8, 7, 7);
+
+        animations['walk_south'] = new SpriteAnimation('player_walking', 8, 0, 5);
+        animations['walk_southwest'] = new SpriteAnimation('player_walking', 8, 6, 11);
+        animations['walk_west'] = new SpriteAnimation('player_walking', 8, 12, 17);
+        animations['walk_northwest'] = new SpriteAnimation('player_walking', 8, 18, 23);
+        animations['walk_north'] = new SpriteAnimation('player_walking', 8, 24, 29);
+        animations['walk_northeast'] = new SpriteAnimation('player_walking', 8, 30, 35);
+        animations['walk_east'] = new SpriteAnimation('player_walking', 8, 36, 41);
+        animations['walk_southeast'] = new SpriteAnimation('player_walking', 8, 42, 47);
+
+        this.animator = new Animator(this, animations, isLocal ? 0xffffff : 0xff0000);
     }
 
-    // Enum for directions
     static Direction = {
         SOUTH: 0,
         SOUTHWEST: 1,
@@ -83,49 +80,52 @@ export default class Player {
         this.movementCircle.setAlpha(0);
     }
 
-    moveTo(position, reachedDestination) {
-        const dx = position.x - this.sprite.x;
-        const dy = position.y - this.sprite.y;
-        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+    #calculateDirection(vector)
+    {
+        const angle = Math.atan2(vector.x, vector.y) * (180 / Math.PI);
 
         let newDirection;
         if (angle >= -22.5 && angle < 22.5) {
-            newDirection = Player.Direction.EAST;
+            newDirection = Player.Direction.SOUTH;
         } else if (angle >= 22.5 && angle < 67.5) {
             newDirection = Player.Direction.SOUTHEAST;
         } else if (angle >= 67.5 && angle < 112.5) {
-            newDirection = Player.Direction.SOUTH;
+            newDirection = Player.Direction.EAST;
         } else if (angle >= 112.5 && angle < 157.5) {
-            newDirection = Player.Direction.SOUTHWEST;
+            newDirection = Player.Direction.NORTHEAST;
         } else if (angle >= 157.5 || angle < -157.5) {
-            newDirection = Player.Direction.WEST;
+            newDirection = Player.Direction.NORTH;
         } else if (angle >= -157.5 && angle < -112.5) {
             newDirection = Player.Direction.NORTHWEST;
         } else if (angle >= -112.5 && angle < -67.5) {
-            newDirection = Player.Direction.NORTH;
+            newDirection = Player.Direction.WEST;
         } else if (angle >= -67.5 && angle < -22.5) {
-            newDirection = Player.Direction.NORTHEAST;
+            newDirection = Player.Direction.SOUTHWEST;
         }
 
         this.currentDirection = newDirection;
+    }
+
+    moveTo(position, reachedDestination) {
+        const dx = position.x - this.sprite.x;
+        const dy = position.y - this.sprite.y;
+        
+        this.#calculateDirection({ x: dx, y: dy });
+
+        let animationName = ''
 
         if (reachedDestination) {
-            if (this.isWalking) {
-                this.isWalking = false;
-                this.currentAnimation.stop();
-                this.currentAnimation = this.idleAnimations[this.currentDirection];
-                this.currentAnimation.play();
-            }
+            this.isWalking = false;
+            animationName = 'idle_';
         } else {
-            if (!this.isWalking)
-            {
-                this.isWalking = true;
-                this.currentAnimation.stop();
-                this.currentAnimation = this.walkAnimations[this.currentDirection];
-                this.currentAnimation.play();
-            }
+            this.isWalking = true;
+            animationName = 'walk_';
         }
+
+        let directionKey = Object.keys(Player.Direction).find(key => Player.Direction[key] === this.currentDirection);
+        animationName += directionKey.toLowerCase();
         
+        this.animator.play(animationName);
         this.sprite.x = position.x;
         this.sprite.y = position.y;
     }
@@ -135,7 +135,7 @@ export default class Player {
         console.log(`⚔️ Player ${this.id} was hit!`);
 
         // Change sprite texture to indicate damage
-        this.sprite.setTexture(this.isLocal ? "piece_selected" : "enemy_damaged");
+        // this.sprite.setTexture(this.isLocal ? "piece_selected" : "enemy_damaged");
 
         // Floating damage text
         let damageText = this.scene.add.text(this.sprite.x, this.sprite.y - 50, "-1", {
@@ -155,7 +155,7 @@ export default class Player {
 
         // Restore original texture after 0.5 seconds
         setTimeout(() => {
-            this.sprite.setTexture(this.isLocal ? "piece" : "enemy");
+            // this.sprite.setTexture(this.isLocal ? "piece" : "enemy");
         }, 500);
     }
 
