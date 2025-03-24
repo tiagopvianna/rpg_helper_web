@@ -14,15 +14,15 @@ export default class PlayerManager {
     initializeLocalPlayer() {
         this.socketService.on("connect", () => {
             const socketId = this.socketService.socket.id;
-            this.localPlayer = new Player(this.scene, socketId, { x: 150, y: 100 }, "piece", true);
+            this.localPlayer = new Player(this.scene, socketId, { x: 150, y: 100 }, true);
 
             this.players[socketId] = this.localPlayer;
         });
     }
 
-    addPlayer(id, startingPosition, texture = "enemy") {
+    addPlayer(id, startingPosition) {
         if (!this.players[id]) {
-            let player = new Player(this.scene, id, startingPosition, texture);
+            let player = new Player(this.scene, id, startingPosition);
 
             player.sprite.on("pointerdown", (pointer, localX, localY, event) => {
                 event.stopPropagation();

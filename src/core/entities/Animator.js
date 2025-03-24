@@ -4,9 +4,9 @@ export default class Animator {
         for (let key in animations) {
             if (animations.hasOwnProperty(key)) {
                 animations[key].setTarget(target);
-                animations[key].setColor(color);
             }
         }
+        this.target.sprite.setTint(color);
         this.animations = animations;
         this.currentAnimation = animations['idle_south'];
         this.currentAnimation.play();

@@ -6,20 +6,14 @@ export default class SpriteAnimation {
         this.lastFrameIndex = firstFrameIndex + numberOfFrames;
         this.currentFrame = 0;
         this.animationInterval = null;
-        this.color = 0xffffff;
     }
 
     setTarget(target) {
         this.target = target;
     }
-    setColor(color)
-    {
-        this.color = color;
-    }
 
     play() {
         this.target.sprite.setTexture(this.spriteSheet);
-        this.target.sprite.setTint(this.color);
         this.target.sprite.setFrame(this.firstFrameIndex);
         this.#startAnimation();
     }

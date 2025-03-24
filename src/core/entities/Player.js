@@ -44,8 +44,6 @@ export default class Player {
         animations['walk_southeast'] = new SpriteAnimation('player_walking', 8, 42, 6);
 
         this.animator = new Animator(this, animations, isLocal ? 0xffffff : 0xff0000);
-        
-        this.sprite.setTint(isLocal ? 0xffffff : 0xff0000);
     }
 
     static Direction = {
