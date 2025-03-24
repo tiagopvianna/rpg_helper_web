@@ -83,7 +83,7 @@ export default class PlayerManager {
                 );
 
                 if (distance <= this.localPlayer.moveRange) {
-                    this.localPlayer.moveTo(pointer.x, pointer.y);
+                    // this.localPlayer.moveTo(pointer.x, pointer.y);
                     this.localPlayer.toggleSelection();
                     this.socketService.emit("playerMove", { x: pointer.x, y: pointer.y });
                 }
@@ -118,9 +118,9 @@ export default class PlayerManager {
         // Atualização de posição dos jogadores
         this.socketService.on("updatePlayers", (players) => {
             Object.keys(players).forEach((id) => {
-                if (id !== this.localPlayer.id) {
+                // if (id !== this.localPlayer.id) {
                     this.updatePlayer(id, players[id].x, players[id].y);
-                }
+                // }
             });
         });
     }

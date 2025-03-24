@@ -8,7 +8,7 @@ export default class Player {
         this.moveRange = 100;
         this.movementCircle.setAlpha(0);
 
-        this.sprite = this.scene.add.sprite(x, y, texture).setInteractive();
+        this.sprite = this.scene.add.sprite(x, y, 'player_idle', 0).setInteractive(); // Set the initial frame to 0
 
         if (isLocal) {
             this.sprite.on("pointerdown", (pointer, localX, localY, event) => {
@@ -20,11 +20,11 @@ export default class Player {
 
     toggleSelection() {
         if (!this.isSelected) {
-            this.sprite.setTexture("piece_selected");
+            // this.sprite.setTexture("piece_selected");
             this.isSelected = true;
             this.showMoveRange();
         } else {
-            this.sprite.setTexture("piece");
+            // this.sprite.setTexture("piece");
             this.isSelected = false;
             this.hideMoveRange();
         }
@@ -42,6 +42,28 @@ export default class Player {
     }
 
     moveTo(x, y) {
+        const dx = x - this.sprite.x;
+        const dy = y - this.sprite.y;
+        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+        if (angle >= -22.5 && angle < 22.5) {
+            this.sprite.setFrame(6); // East
+        } else if (angle >= 22.5 && angle < 67.5) {
+            this.sprite.setFrame(7); // Southeast
+        } else if (angle >= 67.5 && angle < 112.5) {
+            this.sprite.setFrame(0); // South
+        } else if (angle >= 112.5 && angle < 157.5) {
+            this.sprite.setFrame(1); // Southwest
+        } else if (angle >= 157.5 || angle < -157.5) {
+            this.sprite.setFrame(2); // West
+        } else if (angle >= -157.5 && angle < -112.5) {
+            this.sprite.setFrame(3); // Northwest
+        } else if (angle >= -112.5 && angle < -67.5) {
+            this.sprite.setFrame(4); // North
+        } else if (angle >= -67.5 && angle < -22.5) {
+            this.sprite.setFrame(5); // Northeast
+        }
+
         this.sprite.x = x;
         this.sprite.y = y;
     }
