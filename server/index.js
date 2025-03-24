@@ -13,6 +13,28 @@ const io = new Server(server, {
 
 const players = {};
 
+function movePlayerSmoothly(id, player, targetPosition) {
+  const speed = 1; // Adjust the speed as needed
+  const interval = setInterval(() => {
+    const dx = targetPosition.x - player.x;
+    const dy = targetPosition.y - player.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    let reachedDestination = false;
+
+    if (distance < speed) {
+      player.x = targetPosition.x;
+      player.y = targetPosition.y;
+      reachedDestination = true;
+      clearInterval(interval);
+    } else {
+      player.x += (dx / distance) * speed;
+      player.y += (dy / distance) * speed;
+    }
+
+    io.emit("updatePlayer", id, player, reachedDestination);
+  }, 1000 / 60); // 60 frames per second
+}
+
 io.on("connection", (socket) => {
   console.log(`🔵 Player connected: ${socket.id}`);
 
@@ -25,8 +47,7 @@ io.on("connection", (socket) => {
 
   socket.on("playerMove", (data) => {
     if (players[socket.id]) {
-      players[socket.id] = data;
-      io.emit("updatePlayers", players);
+      movePlayerSmoothly(socket.id, players[socket.id], data);
     }
   });
 

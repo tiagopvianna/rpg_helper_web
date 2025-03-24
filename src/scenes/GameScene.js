@@ -17,7 +17,7 @@ export default class GameScene extends Phaser.Scene {
     this.load.image("enemy_damaged", "assets/enemy_damaged.png");
     this.load.image("enemy", "assets/enemy.png");
     this.load.spritesheet("player_idle", "assets/player_idle.png", { frameWidth: 96, frameHeight: 96 }); // Load the spritesheet
-    this.load.image("player_walking", "assets/player_walking.png");
+    this.load.spritesheet("player_walking", "assets/player_walking.png", { frameWidth: 96, frameHeight: 96 }); // Load the spritesheet
   }
 
   create() {

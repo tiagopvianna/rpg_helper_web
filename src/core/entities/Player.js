@@ -16,7 +16,26 @@ export default class Player {
                 this.toggleSelection();
             });
         }
+
+        this.lookDirection = { dx: 0, dy: 0 }; // Initialize look direction
+        this.currentDirection = null; // Initialize current direction
+        this.isWalking = false; // Initialize isWalking
+        this.currentAnimationLength = 1; // Initialize current animation length
+        this.animationInterval = null; // Initialize animation interval
+        this.currentFrame = 0; // Initialize current frame
     }
+
+    // Enum for directions
+    static Direction = {
+        SOUTH: 0,
+        SOUTHWEST: 1,
+        WEST: 2,
+        NORTHWEST: 3,
+        NORTH: 4,
+        NORTHEAST: 5,
+        EAST: 6,
+        SOUTHEAST: 7
+    };
 
     toggleSelection() {
         if (!this.isSelected) {
@@ -41,31 +60,60 @@ export default class Player {
         this.movementCircle.setAlpha(0);
     }
 
-    moveTo(x, y) {
-        const dx = x - this.sprite.x;
-        const dy = y - this.sprite.y;
+    moveTo(position, reachedDestination) {
+        const dx = position.x - this.sprite.x;
+        const dy = position.y - this.sprite.y;
         const angle = Math.atan2(dy, dx) * (180 / Math.PI);
 
+        let newDirection;
         if (angle >= -22.5 && angle < 22.5) {
-            this.sprite.setFrame(6); // East
+            newDirection = Player.Direction.EAST;
         } else if (angle >= 22.5 && angle < 67.5) {
-            this.sprite.setFrame(7); // Southeast
+            newDirection = Player.Direction.SOUTHEAST;
         } else if (angle >= 67.5 && angle < 112.5) {
-            this.sprite.setFrame(0); // South
+            newDirection = Player.Direction.SOUTH;
         } else if (angle >= 112.5 && angle < 157.5) {
-            this.sprite.setFrame(1); // Southwest
+            newDirection = Player.Direction.SOUTHWEST;
         } else if (angle >= 157.5 || angle < -157.5) {
-            this.sprite.setFrame(2); // West
+            newDirection = Player.Direction.WEST;
         } else if (angle >= -157.5 && angle < -112.5) {
-            this.sprite.setFrame(3); // Northwest
+            newDirection = Player.Direction.NORTHWEST;
         } else if (angle >= -112.5 && angle < -67.5) {
-            this.sprite.setFrame(4); // North
+            newDirection = Player.Direction.NORTH;
         } else if (angle >= -67.5 && angle < -22.5) {
-            this.sprite.setFrame(5); // Northeast
+            newDirection = Player.Direction.NORTHEAST;
         }
 
-        this.sprite.x = x;
-        this.sprite.y = y;
+        if (reachedDestination) {
+            this.currentAnimationLength = 1;
+            this.isWalking = false;
+            this.sprite.setTexture('player_idle');
+            clearInterval(this.animationInterval);
+            this.animationInterval = null;
+        } else {
+            this.currentAnimationLength = 6;
+            this.isWalking = true;
+            this.sprite.setTexture('player_walking');
+            if (!this.animationInterval) {
+                this.animationInterval = setInterval(() => this.updateSprite(), 200); // Set the interval to 200 milliseconds for the animation speed
+            }
+        }
+
+        if (newDirection !== this.currentDirection) {
+            this.currentDirection = newDirection;
+            this.currentFrame = 0; // Reset to the first frame of the new direction
+            this.sprite.setFrame(newDirection * this.currentAnimationLength);
+        }
+
+        this.sprite.x = position.x;
+        this.sprite.y = position.y;
+    }
+
+    updateSprite() {
+        if (this.isWalking) {
+            this.currentFrame = (this.currentFrame + 1) % this.currentAnimationLength;
+            this.sprite.setFrame(this.currentDirection * this.currentAnimationLength + this.currentFrame);
+        }
     }
 
     applyDamageEffect() {

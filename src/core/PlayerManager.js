@@ -68,9 +68,9 @@ export default class PlayerManager {
         }
     }
 
-    updatePlayer(id, x, y) {
+    updatePlayer(id, position, reachedDestination) {
         if (this.players[id]) {
-            this.players[id].moveTo(x, y);
+            this.players[id].moveTo(position, reachedDestination);
         }
     }
 
@@ -116,12 +116,8 @@ export default class PlayerManager {
         });
 
         // Atualização de posição dos jogadores
-        this.socketService.on("updatePlayers", (players) => {
-            Object.keys(players).forEach((id) => {
-                // if (id !== this.localPlayer.id) {
-                    this.updatePlayer(id, players[id].x, players[id].y);
-                // }
-            });
+        this.socketService.on("updatePlayer", (playerId, position, reachedDestination) => {
+            this.updatePlayer(playerId, position, reachedDestination);
         });
     }
 }
