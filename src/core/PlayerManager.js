@@ -1,4 +1,5 @@
 import Player from "./entities/Player.js";
+import Vector from "./utils/Vector.js";
 
 export default class PlayerManager {
     constructor(scene, socketService) {
@@ -77,15 +78,15 @@ export default class PlayerManager {
     setListeners() {
         // TODO: fix circular dependency between PlayerManager and GameScene
         this.scene.input.on("pointerdown", (pointer) => {
+            var mousePos = new Vector(pointer.x, pointer.y);
             if (this.localPlayer.isSelected) {
-                const distance = Phaser.Math.Distance.Between(
-                    this.localPlayer.sprite.x, this.localPlayer.sprite.y, pointer.x, pointer.y
-                );
+                var spriteVector = new Vector(this.localPlayer.sprite.x, this.localPlayer.sprite.y);
+                const distance = Vector.GetDifference(spriteVector, mousePos).magnitude();
 
                 if (distance <= this.localPlayer.moveRange) {
                     // this.localPlayer.moveTo(pointer.x, pointer.y);
                     this.localPlayer.toggleSelection();
-                    this.socketService.emit("playerMove", { x: pointer.x, y: pointer.y });
+                    this.socketService.emit("playerMove", mousePos);
                 }
             }
         });

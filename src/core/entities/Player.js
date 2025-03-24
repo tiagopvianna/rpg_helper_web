@@ -1,5 +1,6 @@
 import SpriteAnimation from "./SpriteAnimation.js";
 import Animator from "./Animator.js";
+import Vector from "../utils/Vector.js";
 
 export default class Player {
     constructor(scene, id, startingPosition, isLocal = false) {
@@ -80,37 +81,10 @@ export default class Player {
         this.movementCircle.setAlpha(0);
     }
 
-    #calculateDirection(vector)
-    {
-        const angle = Math.atan2(vector.x, vector.y) * (180 / Math.PI);
-
-        let newDirection;
-        if (angle >= -22.5 && angle < 22.5) {
-            newDirection = Player.Direction.SOUTH;
-        } else if (angle >= 22.5 && angle < 67.5) {
-            newDirection = Player.Direction.SOUTHEAST;
-        } else if (angle >= 67.5 && angle < 112.5) {
-            newDirection = Player.Direction.EAST;
-        } else if (angle >= 112.5 && angle < 157.5) {
-            newDirection = Player.Direction.NORTHEAST;
-        } else if (angle >= 157.5 || angle < -157.5) {
-            newDirection = Player.Direction.NORTH;
-        } else if (angle >= -157.5 && angle < -112.5) {
-            newDirection = Player.Direction.NORTHWEST;
-        } else if (angle >= -112.5 && angle < -67.5) {
-            newDirection = Player.Direction.WEST;
-        } else if (angle >= -67.5 && angle < -22.5) {
-            newDirection = Player.Direction.SOUTHWEST;
-        }
-
-        this.currentDirection = newDirection;
-    }
-
     moveTo(position, reachedDestination) {
-        const dx = position.x - this.sprite.x;
-        const dy = position.y - this.sprite.y;
+        var distanceVector = Vector.GetDifference(position, new Vector(this.sprite.x, this.sprite.y));
         
-        this.#calculateDirection({ x: dx, y: dy });
+        this.currentDirection = distanceVector.getDirectionEnum();
 
         let animationName = ''
 
