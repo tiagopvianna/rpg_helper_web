@@ -12,19 +12,9 @@ export default class Player {
         this.movementCircle = this.scene.add.graphics();
         this.moveRange = 100;
         this.movementCircle.setAlpha(0);
-        this.collider = new Collider(this, new Vector(37,28), 21, 33);
+        this.collider = new Collider(this, new Vector(37,37), 21, 33);
 
         this.sprite = this.scene.add.sprite(startingPosition.x, startingPosition.y, 'player_idle', 0).setInteractive(); // Set the initial frame to 0
-
-        if (isLocal) {
-            this.sprite.on("pointerdown", (pointer, localX, localY, event) => {
-                if (this.collider.containsPoint(new Vector(localX, localY)))
-                {
-                    event.stopPropagation();
-                    this.toggleSelection();
-                }
-            });
-        }
 
         this.lookDirection = { dx: 0, dy: 0 }; 
         this.currentDirection = Player.Direction.SOUTH;

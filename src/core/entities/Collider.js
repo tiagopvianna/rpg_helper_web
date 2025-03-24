@@ -16,12 +16,24 @@ export default class Collider {
     }
 
     // Method to check if a point is inside the collider
-    containsPoint(point) {
-        const absoluteX = this.x + this.attachedObject.sprite.x;
-        const absoluteY = this.y + this.attachedObject.sprite.y;
+    containsPointLocal(point) {
         return point.x >= this.x &&
                point.x <= this.x + this.width &&
                point.y >= this.y &&
                point.y <= this.y + this.height;
     }
+    containsPointAbsolute(point) {
+        const upperLimitX = this.attachedObject.sprite.x + this.x / 2;
+        const lowerLimitX = this.attachedObject.sprite.x - this.x / 2;
+        const upperLimitY = this.attachedObject.sprite.y + this.y / 2;
+        const lowerLimitY = this.attachedObject.sprite.y - this.y / 2;
+    
+        return (
+            point.x >= lowerLimitX &&
+            point.x <= upperLimitX &&
+            point.y >= lowerLimitY &&
+            point.y <= upperLimitY
+        );
+    }
+    
 }
