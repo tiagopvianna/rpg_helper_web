@@ -25,25 +25,27 @@ export default class Player {
         this.isWalking = false;
 
         const animations = {};
-        animations['idle_south'] = new SpriteAnimation('player_idle', 8, 0, 0);
-        animations['idle_southwest'] = new SpriteAnimation('player_idle', 8, 1, 1);
-        animations['idle_west'] = new SpriteAnimation('player_idle', 8, 2, 2);
-        animations['idle_northwest'] = new SpriteAnimation('player_idle', 8, 3, 3);
-        animations['idle_north'] = new SpriteAnimation('player_idle', 8, 4, 4);
-        animations['idle_northeast'] = new SpriteAnimation('player_idle', 8, 5, 5);
-        animations['idle_east'] = new SpriteAnimation('player_idle', 8, 6, 6);
-        animations['idle_southeast'] = new SpriteAnimation('player_idle', 8, 7, 7);
+        animations['idle_south'] = new SpriteAnimation('player_idle', 8, 0);
+        animations['idle_southwest'] = new SpriteAnimation('player_idle', 8, 1);
+        animations['idle_west'] = new SpriteAnimation('player_idle', 8, 2);
+        animations['idle_northwest'] = new SpriteAnimation('player_idle', 8, 3);
+        animations['idle_north'] = new SpriteAnimation('player_idle', 8, 4);
+        animations['idle_northeast'] = new SpriteAnimation('player_idle', 8, 5);
+        animations['idle_east'] = new SpriteAnimation('player_idle', 8, 6);
+        animations['idle_southeast'] = new SpriteAnimation('player_idle', 8, 7);
 
-        animations['walk_south'] = new SpriteAnimation('player_walking', 8, 0, 5);
-        animations['walk_southwest'] = new SpriteAnimation('player_walking', 8, 6, 11);
-        animations['walk_west'] = new SpriteAnimation('player_walking', 8, 12, 17);
-        animations['walk_northwest'] = new SpriteAnimation('player_walking', 8, 18, 23);
-        animations['walk_north'] = new SpriteAnimation('player_walking', 8, 24, 29);
-        animations['walk_northeast'] = new SpriteAnimation('player_walking', 8, 30, 35);
-        animations['walk_east'] = new SpriteAnimation('player_walking', 8, 36, 41);
-        animations['walk_southeast'] = new SpriteAnimation('player_walking', 8, 42, 47);
+        animations['walk_south'] = new SpriteAnimation('player_walking', 8, 0, 6);
+        animations['walk_southwest'] = new SpriteAnimation('player_walking', 8, 6, 6);
+        animations['walk_west'] = new SpriteAnimation('player_walking', 8, 12, 6);
+        animations['walk_northwest'] = new SpriteAnimation('player_walking', 8, 18, 6);
+        animations['walk_north'] = new SpriteAnimation('player_walking', 8, 24, 6);
+        animations['walk_northeast'] = new SpriteAnimation('player_walking', 8, 30, 6);
+        animations['walk_east'] = new SpriteAnimation('player_walking', 8, 36, 6);
+        animations['walk_southeast'] = new SpriteAnimation('player_walking', 8, 42, 6);
 
         this.animator = new Animator(this, animations, isLocal ? 0xffffff : 0xff0000);
+        
+        this.sprite.setTint(isLocal ? 0xffffff : 0xff0000);
     }
 
     static Direction = {

@@ -1,9 +1,9 @@
 export default class SpriteAnimation {
-    constructor(spriteSheet, framerate, firstFrameIndex, lastFrameIndex) {
+    constructor(spriteSheet, framerate, firstFrameIndex, numberOfFrames = 0) {
         this.spriteSheet = spriteSheet;
         this.framerate = framerate;
         this.firstFrameIndex = firstFrameIndex;
-        this.lastFrameIndex = lastFrameIndex;
+        this.lastFrameIndex = firstFrameIndex + numberOfFrames;
         this.currentFrame = 0;
         this.animationInterval = null;
         this.color = 0xffffff;
