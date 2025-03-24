@@ -14,15 +14,15 @@ export default class PlayerManager {
     initializeLocalPlayer() {
         this.socketService.on("connect", () => {
             const socketId = this.socketService.socket.id;
-            this.localPlayer = new Player(this.scene, socketId, 150, 100, "piece", true);
+            this.localPlayer = new Player(this.scene, socketId, { x: 150, y: 100 }, "piece", true);
 
             this.players[socketId] = this.localPlayer;
         });
     }
 
-    addPlayer(id, x, y, texture = "enemy") {
+    addPlayer(id, startingPosition, texture = "enemy") {
         if (!this.players[id]) {
-            let player = new Player(this.scene, id, x, y, texture);
+            let player = new Player(this.scene, id, startingPosition, texture);
 
             player.sprite.on("pointerdown", (pointer, localX, localY, event) => {
                 event.stopPropagation();
@@ -101,14 +101,14 @@ export default class PlayerManager {
         this.socketService.on("currentPlayers", (players) => {
             Object.keys(players).forEach((id) => {
                 if (id !== this.localPlayer.id) {
-                    this.addPlayer(id, players[id].x, players[id].y);
+                    this.addPlayer(id, players[id]);
                 }
             });
         });
 
         // Novo jogador entrando
         this.socketService.on("newPlayer", (playerData) => {
-            this.addPlayer(playerData.id, playerData.x, playerData.y);
+            this.addPlayer(playerData.id, playerData);
         });
 
         this.socketService.on("playerLeft", (playerId) => {

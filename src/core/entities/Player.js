@@ -1,5 +1,7 @@
+import SpriteAnimation from "./SpriteAnimation.js";
+
 export default class Player {
-    constructor(scene, id, x, y, texture, isLocal = false) {
+    constructor(scene, id, startingPosition, isLocal = false) {
         this.scene = scene;
         this.id = id;
         this.isLocal = isLocal;
@@ -8,7 +10,7 @@ export default class Player {
         this.moveRange = 100;
         this.movementCircle.setAlpha(0);
 
-        this.sprite = this.scene.add.sprite(x, y, 'player_idle', 0).setInteractive(); // Set the initial frame to 0
+        this.sprite = this.scene.add.sprite(startingPosition.x, startingPosition.y, 'player_idle', 0).setInteractive(); // Set the initial frame to 0
 
         if (isLocal) {
             this.sprite.on("pointerdown", (pointer, localX, localY, event) => {
@@ -17,12 +19,33 @@ export default class Player {
             });
         }
 
-        this.lookDirection = { dx: 0, dy: 0 }; // Initialize look direction
-        this.currentDirection = null; // Initialize current direction
-        this.isWalking = false; // Initialize isWalking
-        this.currentAnimationLength = 1; // Initialize current animation length
-        this.animationInterval = null; // Initialize animation interval
-        this.currentFrame = 0; // Initialize current frame
+        this.lookDirection = { dx: 0, dy: 0 }; 
+        this.currentDirection = Player.Direction.SOUTH;
+        this.isWalking = false;
+
+        this.idleAnimations = {};
+        this.idleAnimations[Player.Direction.SOUTH] = new SpriteAnimation(this, 'player_idle', 8, 0, 0);
+        this.idleAnimations[Player.Direction.SOUTHWEST] = new SpriteAnimation(this, 'player_idle', 8, 1, 1);
+        this.idleAnimations[Player.Direction.WEST] = new SpriteAnimation(this, 'player_idle', 8, 2, 2);
+        this.idleAnimations[Player.Direction.NORTHWEST] = new SpriteAnimation(this, 'player_idle', 8, 3, 3);
+        this.idleAnimations[Player.Direction.NORTH] = new SpriteAnimation(this, 'player_idle', 8, 4, 4);
+        this.idleAnimations[Player.Direction.NORTHEAST] = new SpriteAnimation(this, 'player_idle', 8, 5, 5);
+        this.idleAnimations[Player.Direction.EAST] = new SpriteAnimation(this, 'player_idle', 8, 6, 6);
+        this.idleAnimations[Player.Direction.SOUTHEAST] = new SpriteAnimation(this, 'player_idle', 8, 7, 7);
+        
+        
+        this.walkAnimations = {};
+        this.walkAnimations[Player.Direction.SOUTH] = new SpriteAnimation(this, 'player_walking', 8, 0, 5);
+        this.walkAnimations[Player.Direction.SOUTHWEST] = new SpriteAnimation(this, 'player_walking', 8, 6, 11);
+        this.walkAnimations[Player.Direction.WEST] = new SpriteAnimation(this, 'player_walking', 8, 12, 17);
+        this.walkAnimations[Player.Direction.NORTHWEST] = new SpriteAnimation(this, 'player_walking', 8, 18, 23);
+        this.walkAnimations[Player.Direction.NORTH] = new SpriteAnimation(this, 'player_walking', 8, 24, 29);
+        this.walkAnimations[Player.Direction.NORTHEAST] = new SpriteAnimation(this, 'player_walking', 8, 30, 35);
+        this.walkAnimations[Player.Direction.EAST] = new SpriteAnimation(this, 'player_walking', 8, 36, 41);
+        this.walkAnimations[Player.Direction.SOUTHEAST] = new SpriteAnimation(this, 'player_walking', 8, 42, 47);
+        
+        this.currentAnimation = this.idleAnimations[this.currentDirection];
+        this.currentAnimation.play();
     }
 
     // Enum for directions
@@ -84,37 +107,29 @@ export default class Player {
             newDirection = Player.Direction.NORTHEAST;
         }
 
+        this.currentDirection = newDirection;
+
         if (reachedDestination) {
-            this.currentAnimationLength = 1;
-            this.isWalking = false;
-            this.sprite.setTexture('player_idle');
-            clearInterval(this.animationInterval);
-            this.animationInterval = null;
+            if (this.isWalking) {
+                this.isWalking = false;
+                this.currentAnimation.stop();
+                this.currentAnimation = this.idleAnimations[this.currentDirection];
+                this.currentAnimation.play();
+            }
         } else {
-            this.currentAnimationLength = 6;
-            this.isWalking = true;
-            this.sprite.setTexture('player_walking');
-            if (!this.animationInterval) {
-                this.animationInterval = setInterval(() => this.updateSprite(), 200); // Set the interval to 200 milliseconds for the animation speed
+            if (!this.isWalking)
+            {
+                this.isWalking = true;
+                this.currentAnimation.stop();
+                this.currentAnimation = this.walkAnimations[this.currentDirection];
+                this.currentAnimation.play();
             }
         }
-
-        if (newDirection !== this.currentDirection) {
-            this.currentDirection = newDirection;
-            this.currentFrame = 0; // Reset to the first frame of the new direction
-            this.sprite.setFrame(newDirection * this.currentAnimationLength);
-        }
-
+        
         this.sprite.x = position.x;
         this.sprite.y = position.y;
     }
 
-    updateSprite() {
-        if (this.isWalking) {
-            this.currentFrame = (this.currentFrame + 1) % this.currentAnimationLength;
-            this.sprite.setFrame(this.currentDirection * this.currentAnimationLength + this.currentFrame);
-        }
-    }
 
     applyDamageEffect() {
         console.log(`⚔️ Player ${this.id} was hit!`);

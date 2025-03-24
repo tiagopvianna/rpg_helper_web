@@ -14,7 +14,7 @@ const io = new Server(server, {
 const players = {};
 
 function movePlayerSmoothly(id, player, targetPosition) {
-  const speed = 1; // Adjust the speed as needed
+  const speed = 4;
   const interval = setInterval(() => {
     const dx = targetPosition.x - player.x;
     const dy = targetPosition.y - player.y;
@@ -22,8 +22,7 @@ function movePlayerSmoothly(id, player, targetPosition) {
     let reachedDestination = false;
 
     if (distance < speed) {
-      player.x = targetPosition.x;
-      player.y = targetPosition.y;
+      player = targetPosition;
       reachedDestination = true;
       clearInterval(interval);
     } else {
@@ -45,9 +44,9 @@ io.on("connection", (socket) => {
   // emite para os outros sockets que não este
   socket.broadcast.emit("newPlayer", { id: socket.id, ...players[socket.id] });
 
-  socket.on("playerMove", (data) => {
+  socket.on("playerMove", (destination) => {
     if (players[socket.id]) {
-      movePlayerSmoothly(socket.id, players[socket.id], data);
+      movePlayerSmoothly(socket.id, players[socket.id], destination);
     }
   });
 
