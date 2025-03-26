@@ -1,4 +1,6 @@
 import Player from "./entities/Player.js";
+import Vector from "./utils/Vector.js";
+import InputManager from "./InputManager.js";
 
 export default class PlayerManager {
     constructor(scene, socketService) {
@@ -8,30 +10,23 @@ export default class PlayerManager {
         this.localPlayer = null;
 
         this.initializeLocalPlayer();
+        this.inputManager = new InputManager(scene, this);
         this.setListeners();
     }
 
     initializeLocalPlayer() {
         this.socketService.on("connect", () => {
             const socketId = this.socketService.socket.id;
-            this.localPlayer = new Player(this.scene, socketId, 150, 100, "piece", true);
+            this.localPlayer = new Player(this.scene, socketId, { x: 150, y: 100 }, true);
 
             this.players[socketId] = this.localPlayer;
         });
     }
 
-    addPlayer(id, x, y, texture = "enemy") {
+    addPlayer(id, startingPosition) {
         if (!this.players[id]) {
-            let player = new Player(this.scene, id, x, y, texture);
-
-            player.sprite.on("pointerdown", (pointer, localX, localY, event) => {
-                event.stopPropagation();
-
-                if (this.localPlayer.isSelected) {
-                    this.attackPlayer(player, id);
-                }
-            });
-
+            let player = new Player(this.scene, id, startingPosition);
+            player.sprite.setInteractive({ useHandCursor: true, pixelPerfect: false });
             this.players[id] = player;
         }
     }
@@ -68,28 +63,13 @@ export default class PlayerManager {
         }
     }
 
-    updatePlayer(id, x, y) {
+    updatePlayer(id, position, reachedDestination) {
         if (this.players[id]) {
-            this.players[id].moveTo(x, y);
+            this.players[id].moveTo(position, reachedDestination);
         }
     }
 
     setListeners() {
-        // TODO: fix circular dependency between PlayerManager and GameScene
-        this.scene.input.on("pointerdown", (pointer) => {
-            if (this.localPlayer.isSelected) {
-                const distance = Phaser.Math.Distance.Between(
-                    this.localPlayer.sprite.x, this.localPlayer.sprite.y, pointer.x, pointer.y
-                );
-
-                if (distance <= this.localPlayer.moveRange) {
-                    this.localPlayer.moveTo(pointer.x, pointer.y);
-                    this.localPlayer.toggleSelection();
-                    this.socketService.emit("playerMove", { x: pointer.x, y: pointer.y });
-                }
-            }
-        });
-
         this.socketService.on("playerHit", (targetId) => {
             if (this.players[targetId]) {
                 console.log(`Player ${targetId} hit!`);
@@ -101,14 +81,14 @@ export default class PlayerManager {
         this.socketService.on("currentPlayers", (players) => {
             Object.keys(players).forEach((id) => {
                 if (id !== this.localPlayer.id) {
-                    this.addPlayer(id, players[id].x, players[id].y);
+                    this.addPlayer(id, players[id]);
                 }
             });
         });
 
         // Novo jogador entrando
         this.socketService.on("newPlayer", (playerData) => {
-            this.addPlayer(playerData.id, playerData.x, playerData.y);
+            this.addPlayer(playerData.id, playerData);
         });
 
         this.socketService.on("playerLeft", (playerId) => {
@@ -116,12 +96,8 @@ export default class PlayerManager {
         });
 
         // Atualização de posição dos jogadores
-        this.socketService.on("updatePlayers", (players) => {
-            Object.keys(players).forEach((id) => {
-                if (id !== this.localPlayer.id) {
-                    this.updatePlayer(id, players[id].x, players[id].y);
-                }
-            });
+        this.socketService.on("updatePlayer", (playerId, position, reachedDestination) => {
+            this.updatePlayer(playerId, position, reachedDestination);
         });
     }
 }
