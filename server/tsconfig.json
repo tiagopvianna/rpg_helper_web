@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "commonjs", // keep Node's default
+        "rootDir": "src",
+        "outDir": "dist",
+        "strict": true, // turn on all the good checks
+        "esModuleInterop": true, // lets you use `import x from`
+        "resolveJsonModule": true,
+        "skipLibCheck": true
+    },
+    "include": [
+        "src/**/*"
+    ]
+}

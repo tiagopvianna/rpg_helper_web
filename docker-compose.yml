@@ -16,8 +16,18 @@ services:
     build: ./server
     ports:
       - "3000:3000"
-    volumes:
-      - ./server:/server
-      - /server/node_modules
-    working_dir: /server
-    command: node index.js
+
+    # this is how it was in the beginning
+    # volumes:
+    #   - ./server:/server
+    #   - /server/node_modules
+    # working_dir: /server
+
+    # add this to hot reload server
+    # volumes:
+    #   - ./server:/server        # keep for live editing
+    #   - /server/node_modules    # named/anon vol to avoid host pollution
+    # working_dir: /server
+    # command: npm run dev        # ts-node-dev
+
+    command: node dist/index.js
