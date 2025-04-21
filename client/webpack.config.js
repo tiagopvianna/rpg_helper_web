@@ -2,7 +2,7 @@ const path = require("path");
 
 module.exports = {
   mode: "development",
-  entry: "./src/index.ts",
+  entry: "./index.ts",
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.js",
@@ -10,14 +10,14 @@ module.exports = {
   },
   devServer: {
     static: {
-      directory: path.join(__dirname, "public"),
+      directory: __dirname,
     },
     allowedHosts: "all",
     host: "0.0.0.0",
     port: 8080,
     hot: true,  // 🔹 Habilita o Hot Module Replacement (HMR)
     liveReload: true,
-    watchFiles: ["public/**/*", "src/**/*"],  // 🔹 Monitora mudanças nos arquivos JS
+    watchFiles: ["./**/*"],  // 🔹 Monitora mudanças nos arquivos JS
     client: {
       overlay: true,
     },

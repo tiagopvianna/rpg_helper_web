@@ -1,11 +1,11 @@
 version: "3.8"
 services:
   game:
-    build: .
+    build: ./client
     ports:
       - "8080:8080"
     volumes:
-      - .:/app
+      - ./client:/app
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
