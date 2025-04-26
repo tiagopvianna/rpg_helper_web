@@ -1,0 +1,5 @@
+export enum EVENTS {
+    PLAYER_MOVED = 'PLAYER_MOVED',
+    PLAYER_JOINED = 'PLAYER_JOINED',
+  }
+  

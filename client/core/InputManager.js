@@ -29,6 +29,11 @@ export default class InputManager {
                 if (distance <= this.playerManager.localPlayer.moveRange) {
                     this.playerManager.localPlayer.toggleSelection();
                     this.playerManager.socketService.emit("playerMove", mousePos);
+                    this.playerManager.gameLogic.sendEvent({
+                        type: "PLAYER_MOVED",
+                        playerId: "local",
+                        position: mousePos
+                    });
                 }
             }
             else if (this.playerManager.localPlayer.collider.containsPointAbsolute(mousePos))

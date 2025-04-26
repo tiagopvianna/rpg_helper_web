@@ -6,6 +6,7 @@ services:
       - "8080:8080"
     volumes:
       - ./client:/app
+      - ./shared_core:/shared_core 
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true

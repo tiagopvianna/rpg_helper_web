@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import GameScene from "./scenes/GameScene";
+import GameScene from "./src/scenes/GameScene";
 
 declare global {
   interface Window {

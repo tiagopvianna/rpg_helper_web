@@ -3,13 +3,24 @@ import Vector from "./utils/Vector.js";
 import InputManager from "./InputManager.js";
 
 export default class PlayerManager {
-    constructor(scene, socketService) {
+    constructor(scene, socketService, gameLogic, players) {
         this.scene = scene;
         this.socketService = socketService;
         this.players = {};
         this.localPlayer = null;
+        this.gameLogic = gameLogic;
 
-        this.initializeLocalPlayer();
+        // this.initializeLocalPlayer();
+        // write code to iterate 
+        // Object.keys(players).forEach((id) => {
+        //     this.addPlayer(id, players[id]);
+        // });
+
+        // lendo do estado da maquina de estados, fazer percorrer lista
+        this.localPlayer = new Player(this.scene, "local", { ... players["local"].position}, true);
+        this.players["local"] = this.localPlayer;
+
+
         this.inputManager = new InputManager(scene, this);
         this.setListeners();
     }
@@ -50,12 +61,6 @@ export default class PlayerManager {
         }
     }
 
-    // TODO: implement convert mechanic
-    convertEnemy(enemy) {
-        return;
-    }
-
-
     removePlayer(id) {
         if (this.players[id]) {
             this.players[id].destroy();
@@ -70,6 +75,23 @@ export default class PlayerManager {
     }
 
     setListeners() {
+        this.gameLogic.onStateChange(({ state, changes }) => {
+            changes.forEach((event) => {
+              switch (event.type) {
+                case "PLAYER_JOINED":
+                  console.log("PLAYER_JOINED, state: ", state);
+                //   this.addPlayer(event.playerId, event.position);
+                  break;
+        
+                case "PLAYER_MOVED":
+                  console.log("PLAYER_MOVED, state: ", state);
+                  // antes tem que fazer renderizar pelo estado
+                  this.updatePlayer(event.playerId, event.position, true);
+                  break;
+              }
+            });
+          });
+
         this.socketService.on("playerHit", (targetId) => {
             if (this.players[targetId]) {
                 console.log(`Player ${targetId} hit!`);
@@ -78,13 +100,13 @@ export default class PlayerManager {
         });
 
         // Atualiza lista de jogadores ao entrar
-        this.socketService.on("currentPlayers", (players) => {
-            Object.keys(players).forEach((id) => {
-                if (id !== this.localPlayer.id) {
-                    this.addPlayer(id, players[id]);
-                }
-            });
-        });
+        // this.socketService.on("currentPlayers", (players) => {
+        //     Object.keys(players).forEach((id) => {
+        //         if (id !== this.localPlayer.id) {
+        //             this.addPlayer(id, players[id]);
+        //         }
+        //     });
+        // });
 
         // Novo jogador entrando
         this.socketService.on("newPlayer", (playerData) => {
