@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+      "outDir": "dist",         // ← emit JS here
+      "rootDir": "src",         // ← source TS lives under src/
+      "declaration": true,      // ← also emit .d.ts files alongside .js
+      "declarationMap": true,   // ← optional, for easier debugging
+    },
+    "include": ["src/**/*"]
+  }
+  

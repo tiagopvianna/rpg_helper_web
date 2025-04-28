@@ -3,12 +3,14 @@ FROM node:18-alpine
 WORKDIR /server
 
 # Install deps first for better layer caching
-COPY package.json package-lock.json ./
+COPY server/package.json server/package-lock.json ./
+COPY shared_core ./shared_core
 RUN npm install
 
 # Copy source and compile
-COPY tsconfig.json ./
-COPY src ./src
+COPY server/tsconfig.json ./
+COPY server/src ./src
+RUN cd shared_core && npm install && npm run build
 RUN npx tsc
 
 EXPOSE 3000

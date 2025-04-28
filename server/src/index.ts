@@ -2,68 +2,61 @@ import express from "express";
 import http from "http";
 import { Server, Socket } from "socket.io";
 import cors from "cors";
+import bodyParser from "body-parser";
 
-/* ─ Types ────────────────────────────────────────────── */
-interface Vector2 { x: number; y: number; }
-interface Player extends Vector2 {}
+import { GameState, StateMachine, GameEvent } from "@rpg_helper_web/shared_core";
 
-/* ─ Server setup ─────────────────────────────────────── */
+// ─── Setup ───────────────────────────────────────────
 const app = express();
 app.use(cors());
-
+app.use(bodyParser.json()); // <-- parse JSON bodies for API
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
-const players: Record<string, Player> = {};
+const gameState = new GameState({});
+const stateMachine = new StateMachine(gameState);
 
-/* ─ Helpers ──────────────────────────────────────────── */
-function movePlayerSmoothly(id: string, player: Player, dest: Vector2) {
-  const speed = 4;
-  const tick = setInterval(() => {
-    const dx = dest.x - player.x;
-    const dy = dest.y - player.y;
-    const dist = Math.hypot(dx, dy);
-
-    let reached = false;
-    if (dist < speed) {
-      player.x = dest.x;
-      player.y = dest.y;
-      reached = true;
-      clearInterval(tick);
-    } else {
-      player.x += (dx / dist) * speed;
-      player.y += (dy / dist) * speed;
-    }
-    io.emit("updatePlayer", id, player, reached);
-  }, 1000 / 60);           // 60 FPS
-}
-
-/* ─ Socket handlers ──────────────────────────────────── */
+// ─── On Connect ──────────────────────────────────────
 io.on("connection", (socket: Socket) => {
-  console.log(`🔵  ${socket.id} connected`);
+  console.log(`🔵 ${socket.id} connected`);
 
-  players[socket.id] = { x: 150, y: 100 };
+  // Client sends GameEvents
+  socket.on("message", (msg) => {
+    console.log("has received message!");
+    const event: GameEvent = JSON.parse(msg);
 
-  socket.emit("currentPlayers", players);
-  socket.broadcast.emit("newPlayer", { id: socket.id, ...players[socket.id] });
+    const { state, changes } = stateMachine.apply(event);
 
-  socket.on("playerMove", (dest: Vector2) => {
-    if (players[socket.id]) movePlayerSmoothly(socket.id, players[socket.id], dest);
-  });
-
-  socket.on("playerAttack", (targetId: string) => {
-    if (players[targetId]) {
-      console.log(`⚔️  ${socket.id} attacked ${targetId}`);
-      io.emit("playerHit", targetId);
-    }
+    // Broadcast full update (or just the changes if you prefer)
+    const update = JSON.stringify({ state, changes });
+    io.emit("message", update);
   });
 
   socket.on("disconnect", () => {
-    console.log(`🔴  ${socket.id} disconnected`);
-    delete players[socket.id];
-    io.emit("playerLeft", socket.id);
+    console.log(`🔴 ${socket.id} disconnected`);
+    // Optionally handle PLAYER_LEFT event
   });
 });
 
+
+// ─── Test API Routes ──────────────────────────────────────
+app.post("/api/event", (req, res) => {
+  const event: GameEvent = req.body;
+  console.log("🎯 Received API Event:", event);
+
+  const { state, changes } = stateMachine.apply(event);
+
+  // Broadcast the new state to all clients
+  const update = JSON.stringify({ state, changes });
+  io.emit("message", update);
+
+  res.send({ success: true, changes });
+});
+
+app.get("/api/state", (req, res) => {
+  res.send(gameState); // or { ...gameState } if you want a plain object
+});
+
+// ─── Start ───────────────────────────────────────────
 const PORT = process.env.PORT ?? 3000;
-server.listen(PORT, () => console.log(`🚀  WebSocket server on :${PORT}`));
+server.listen(PORT, () => console.log(`🚀 WebSocket server on :${PORT}`));

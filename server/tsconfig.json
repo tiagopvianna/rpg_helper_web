@@ -1,5 +1,7 @@
 {
     "compilerOptions": {
+        "moduleResolution": "node", // ← look in node_modules
+        "baseUrl": ".", // ← allow bare-import lookups from here
         "target": "ES2020",
         "module": "commonjs", // keep Node's default
         "rootDir": "src",

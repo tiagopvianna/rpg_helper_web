@@ -14,7 +14,9 @@ services:
     command: npm run dev
     restart: always
   server:
-    build: ./server
+    build:
+      context: .                 # ← now the *whole repo* is in context
+      dockerfile: ./server/Dockerfile
     ports:
       - "3000:3000"
 

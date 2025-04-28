@@ -15,6 +15,10 @@ export default class LocalGameLogic implements IGameLogic {
     this.stateMachine = new StateMachine(initialState);
   }
 
+  getState(): StateUpdate {
+    return this.stateUpdate;
+  }
+
   sendEvent(event: GameEvent): void {
     this.stateUpdate = this.stateMachine.apply(event);
     this.listeners.forEach(callback => callback(this.stateUpdate));
