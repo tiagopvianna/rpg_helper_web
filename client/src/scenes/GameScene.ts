@@ -18,6 +18,9 @@ export default class GameScene extends Phaser.Scene {
         this.load.image("piece_selected", "assets/player_selected.png");
         this.load.image("enemy_damaged", "assets/enemy_damaged.png");
         this.load.image("enemy", "assets/enemy.png");
+        this.load.spritesheet("knight", "assets/2.png", { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet("s_idle", "assets/S_Idle.png", { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet("s_walk", "assets/S_Walk.png", { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet("player_idle", "assets/player_idle.png", { frameWidth: 96, frameHeight: 96 }); // Load the spritesheet
         this.load.spritesheet("player_walking", "assets/player_walking.png", { frameWidth: 96, frameHeight: 96 }); // Load the spritesheet
     }
@@ -48,15 +51,15 @@ export default class GameScene extends Phaser.Scene {
     setAnimations(): void {
         this.anims.create({
             key: "player_idle",
-            frames: this.anims.generateFrameNumbers("player_idle", { start: 0, end: 0 }),
-            frameRate: 6,
+            frames: this.anims.generateFrameNumbers("knight", { start: 0, end: 3 }),
+            frameRate: 4,
             repeat: -1
         });
 
         this.anims.create({
             key: "player_walking",
-            frames: this.anims.generateFrameNumbers("player_walking", { start: 0, end: 5 }),
-            frameRate: 10,
+            frames: this.anims.generateFrameNumbers("knight", { start: 48, end: 54 }),
+            frameRate: 8,
             repeat: -1
         });
     }

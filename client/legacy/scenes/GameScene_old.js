@@ -1,7 +1,7 @@
 import Phaser from "phaser";
-import WebSocketService from "../network/WebSocketService.js";
+import WebSocketService from "../../network/WebSocketService.js";
 import PlayerManager from "../core/PlayerManager.js";
-import LocalGameLogic from "../test/LocalGameLogic.js";
+import LocalGameLogic from "../../test/LocalGameLogic.js";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {

@@ -11,10 +11,11 @@ export class PlayerSprite {
   constructor(scene: Phaser.Scene, id: string, position: Position) {
     this.scene = scene;
     this.id = id;
-    this.sprite = scene.add.sprite(position.x, position.y, "player_idle");
+    this.sprite = scene.add.sprite(position.x, position.y, "knight").setScale(3);
     this.sprite.setOrigin(0.5, 0.5);
 
     this.animator = new Animator(this.sprite);
+    this.animator.play("player_idle");
   }
 
   moveTo(newPosition: Position) {
