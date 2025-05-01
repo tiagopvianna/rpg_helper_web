@@ -13,6 +13,7 @@ export default class PlayerController implements IPlayerController {
     this.playerSprites = {};
   }
 
+  // esse metodo provavelmente vai crescer em complexidade
   updateState(update: StateUpdate): void {
     const { state } = update;
     const playerStates = state.players;

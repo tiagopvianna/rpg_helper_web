@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import PlayerManager from "../PlayerManager";
-import PlayerController  from "../presenter/PlayerController";
+import PlayerController from "../presenter/PlayerController";
 import LocalGameLogic from "../../test/LocalGameLogic";
 import { EVENTS } from "../../../shared_core/src/events/EventTypes";
 import { RemoteGameLogic } from "../../test/RemoteGameLogic";
@@ -23,20 +23,41 @@ export default class GameScene extends Phaser.Scene {
     }
 
     create(): void {
+        this.setAnimations()
+
         const board = this.add.image(this.scale.width / 2, this.scale.height / 2, "board");
         board.setDisplaySize(this.scale.width, this.scale.height);
-        
+
         const playerController = new PlayerController(this);
-        
+
         // const gameLogic = new LocalGameLogic();
         const gameLogic = new RemoteGameLogic("http://localhost:3000");
 
-        gameLogic.sendEvent({
-            type: EVENTS.PLAYER_JOINED,
-            playerId: "local", // Use a constant or UUID if needed
-            position: { x: 200, y: 300 }
-        });
+        // waiting for remote implementation to be ready
+        setTimeout(() => {
+            gameLogic.sendEvent({
+                type: EVENTS.PLAYER_JOINED,
+                playerId: "local",
+                position: { x: 300, y: 300 }
+            });
+        }, 1000);
 
         this.playerManager = new PlayerManager(playerController, gameLogic, gameLogic.getState().state);
+    }
+
+    setAnimations(): void {
+        this.anims.create({
+            key: "player_idle",
+            frames: this.anims.generateFrameNumbers("player_idle", { start: 0, end: 0 }),
+            frameRate: 6,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: "player_walking",
+            frames: this.anims.generateFrameNumbers("player_walking", { start: 0, end: 5 }),
+            frameRate: 10,
+            repeat: -1
+        });
     }
 }

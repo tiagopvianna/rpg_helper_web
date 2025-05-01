@@ -4,7 +4,7 @@ import { Server, Socket } from "socket.io";
 import cors from "cors";
 import bodyParser from "body-parser";
 
-import { GameState, StateMachine, GameEvent } from "@rpg_helper_web/shared_core";
+import { GameState, StateMachine, GameEvent, EVENTS } from "@rpg_helper_web/shared_core";
 
 // ─── Setup ───────────────────────────────────────────
 const app = express();
@@ -34,7 +34,17 @@ io.on("connection", (socket: Socket) => {
 
   socket.on("disconnect", () => {
     console.log(`🔴 ${socket.id} disconnected`);
-    // Optionally handle PLAYER_LEFT event
+
+    const event: GameEvent = {
+      type: EVENTS.PLAYER_LEFT,
+      // id no cliente está hardcoded como "local"
+      playerId: socket.id,
+    };
+
+    const { state, changes } = stateMachine.apply(event);
+
+    const update = JSON.stringify({ state, changes });
+    io.emit("message", update);
   });
 });
 
@@ -54,7 +64,7 @@ app.post("/api/event", (req, res) => {
 });
 
 app.get("/api/state", (req, res) => {
-  res.send(gameState); // or { ...gameState } if you want a plain object
+  res.send({...stateMachine});
 });
 
 // ─── Start ───────────────────────────────────────────

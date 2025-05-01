@@ -36,6 +36,11 @@ export default class PlayerManager {
             console.log("PLAYER_MOVED", event.playerId);
             this.controller.updateState(update);
             break;
+
+            // case "PLAYER_LEFT":
+            //   console.log("PLAYER_MOVED", event.playerId);
+            //   this.controller.updateState(update);
+            //   break;
         }
       });
     });
