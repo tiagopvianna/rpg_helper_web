@@ -18,6 +18,18 @@ export class PlayerSprite {
     this.animator.play("player_idle");
   }
 
+  attack() {
+    this.animator.play("player_attack");
+
+    this.sprite.once(
+      Phaser.Animations.Events.ANIMATION_COMPLETE + "-player_attack",
+      () => {
+        // when done, go back to idle
+        this.animator.play("player_idle");
+      }
+    );
+  }
+
   moveTo(newPosition: Position) {
     const distance = Phaser.Math.Distance.Between(
       this.sprite.x,

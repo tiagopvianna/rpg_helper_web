@@ -58,9 +58,16 @@ export default class GameScene extends Phaser.Scene {
 
         this.anims.create({
             key: "player_walking",
-            frames: this.anims.generateFrameNumbers("knight", { start: 48, end: 54 }),
+            frames: this.anims.generateFrameNumbers("knight", { start: 48, end: 53 }),
             frameRate: 8,
             repeat: -1
+        });
+
+        this.anims.create({
+            key: "player_attack",
+            frames: this.anims.generateFrameNumbers("knight", { start: 96, end: 99 }),
+            frameRate: 8,
+            repeat: 0
         });
     }
 }

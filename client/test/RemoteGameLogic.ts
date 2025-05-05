@@ -1,6 +1,6 @@
 import { IGameLogic } from '../../shared_core/src/interfaces/IGameLogic';
 import { GameEvent } from '../../shared_core/src/events/GameEvent';
-import { StateUpdate } from '../../shared_core/src/interfaces/StateUpdate';
+import { StateUpdate } from '../../shared_core/src/entities/StateUpdate';
 
 import { io, Socket } from "socket.io-client";  // 👈 using socket.io-client
 import { GameState } from '../../shared_core/src/entities/GameState';

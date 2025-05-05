@@ -1,7 +1,7 @@
 import { GameState } from '../entities/GameState';
 import { GameEvent } from '../events/GameEvent';
 import { EVENTS } from '../events/EventTypes';
-import { StateUpdate } from '../interfaces/StateUpdate';
+import { StateUpdate } from '../entities/StateUpdate';
 import { Player } from '../entities/Player';
 
 export class StateMachine {
@@ -37,6 +37,12 @@ export class StateMachine {
         switch (event.type) {
             case EVENTS.PLAYER_LEFT:
                 delete newState.players[event.playerId];
+                changes.push(event);
+                break;
+        }
+
+        switch (event.type) {
+            case EVENTS.PLAYER_ATTACKED:
                 changes.push(event);
                 break;
         }

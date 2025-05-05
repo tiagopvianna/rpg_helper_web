@@ -1,5 +1,5 @@
 import { GameEvent } from '../events/GameEvent';
-import { StateUpdate } from './StateUpdate';
+import { StateUpdate } from '../entities/StateUpdate';
 
 export interface IGameLogic {
   getState(): StateUpdate;

@@ -1,7 +1,7 @@
 import { IGameLogic } from '/shared_core/src/interfaces/IGameLogic';
 import { StateMachine } from '/shared_core/src/usecases/StateMachine';
 import { GameState } from '/shared_core/src/entities/GameState';
-import { StateUpdate } from '/shared_core/src/interfaces/StateUpdate';
+import { StateUpdate } from '/shared_core/src/entities/StateUpdate';
 import { GameEvent } from '/shared_core/src/events/GameEvent';
 
 export default class LocalGameLogic implements IGameLogic {

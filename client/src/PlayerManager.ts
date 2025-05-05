@@ -1,9 +1,10 @@
 import { IPlayerController } from "./interfaces/IPlayerController";
 import { IGameLogic } from "../../shared_core/src/interfaces/IGameLogic";
-import { StateUpdate } from "../../shared_core/src/interfaces/StateUpdate";
+import { StateUpdate } from "../../shared_core/src/entities/StateUpdate";
 import { GameEvent } from "../../shared_core/src/events/GameEvent";
 import { Player } from "../../shared_core/src/entities/Player";
 import { GameState } from "../../shared_core/src/entities/GameState";
+import { EVENTS } from "../../shared_core/src/events/EventTypes";
 
 export default class PlayerManager {
   private controller: IPlayerController;
@@ -41,6 +42,11 @@ export default class PlayerManager {
             //   console.log("PLAYER_MOVED", event.playerId);
             //   this.controller.updateState(update);
             //   break;
+
+          case EVENTS.PLAYER_ATTACKED:
+            console.log("PLAYER_ATTACKED", event.playerId);
+            this.controller.updateState(update);
+            break;
         }
       });
     });
