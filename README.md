@@ -1,33 +1,53 @@
-# # RPG Board Helper Game (Dockerized)
+# RPG Helper Web
 
-This is a Phaser-based board game, fully dockerized for easy setup.
+A multiplayer, browser-based RPG sandbox designed to help players create and play encounters while keeping the focus on storytelling. 
 
-## 🚀 Running the Game for the First Time
+This project is structured as a three-layer application:
+	•	Client-side application: A TypeScript-based web frontend built with Webpack, responsible for user interaction, rendering, and animations.
+	•	Server: A Node.js backend using Express.js and Socket.IO to manage real-time communication and game state synchronization. It exposes a REST API for triggering events and retrieving the current game state.
+	•	Shared mechanics core: A TypeScript module (@rpg_helper_web/shared_core) that implements the core logic, including the GameState and StateMachine.
 
-1️⃣ **Clone the repository**
+Clients send game events through WebSockets or REST (/api/event), which the server applies to a central state and broadcasts back to all connected clients. The result is a collaborative, real-time RPG environment that enhances immersion and supports external integrations.
+
+
+![Input](example/rpg_helper.gif)
+
+## Setup
+
+1. **Clone the repository**
 ```sh
-git clone https://github.com/seu-usuario/seu-repositorio.git
-cd seu-repositorio
+git clone https://github.com/tiagopvianna/rpg_helper_web.git
+cd rpg_helper_web
 ```
 
-2️⃣ **Run the game using Docker**
+2. **Run the game using Docker**
 ```sh
 docker-compose up --build
 ```
 
-3️⃣ **Access the game in your browser**
+3. **Access the game in your browser**
 ```sh
 http://localhost:8080
 ```
 
-4️⃣ **Stop the game**
+4. **Stop the game**
 ```sh
 docker-compose down
 ```
 
-🔄 **Running Again (Without Rebuilding)**
-```sh
-docker-compose up
-```
+## Usage
 
-## **🚀 Now it's ready!**
+**Add events to the state machine**
+```sh
+curl -X POST \
+-H "Content-Type: application/json" \
+-d '{
+ "type": "PLAYER_MOVED",
+ "playerId": "local",
+ "position": {
+ "x": 200,
+ "y": 400
+ }
+}' \
+http://localhost:3000/api/event
+```
