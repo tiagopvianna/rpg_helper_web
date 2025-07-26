@@ -3,8 +3,11 @@
 A multiplayer, browser-based RPG sandbox designed to help players create and play encounters while keeping the focus on storytelling. 
 
 This project is structured as a three-layer application:
+
 •	Client-side application: A TypeScript-based web frontend built with Webpack, responsible for user interaction, rendering, and animations.
+
 •	Server: A Node.js backend using Express.js and Socket.IO to manage real-time communication and game state synchronization. It exposes a REST API for triggering events and retrieving the current game state.
+
 •	Shared mechanics core: A TypeScript module (@rpg_helper_web/shared_core) that implements the core logic, including the GameState and StateMachine.
 
 Clients send game events through WebSockets or REST (/api/event), which the server applies to a central state and broadcasts back to all connected clients. The result is a collaborative, real-time RPG environment that enhances immersion and supports external integrations.
